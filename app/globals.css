@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --prokoti-bg: #F4F0FF;
+  --prokoti-primary: #5E43D8;
+  --prokoti-text: #2D1B6B;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--prokoti-bg);
+  color: var(--prokoti-text);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+@layer utilities {
+  .prokoti-card {
+    @apply bg-white rounded-xl shadow-card;
+  }
+  .prokoti-btn-primary {
+    @apply bg-[#5E43D8] hover:bg-[#4B36AD] text-white font-semibold rounded-xl px-5 py-2.5 transition-all duration-200;
+  }
+  .prokoti-btn-outline {
+    @apply border border-[#5E43D8] text-[#5E43D8] hover:bg-[#F4F0FF] font-semibold rounded-xl px-5 py-2.5 transition-all duration-200;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #C4B5FD transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #C4B5FD;
+    border-radius: 4px;
+  }
+}
