@@ -89,6 +89,7 @@ export default function SelectRolePage() {
         const role = ROLES.find(r => r.id === selected)!
         localStorage.setItem('userRole', selected)
         await new Promise(r => setTimeout(r, 400))
+        setLoading(false)
         router.push(role.route)
     }
 
