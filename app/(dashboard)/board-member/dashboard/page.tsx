@@ -2270,11 +2270,11 @@ export default function DashboardPage() {
                             : ['Financials', 'ESG', 'Governance', 'Risk', 'Compliance'] as TabType[];
                         return (
                             <div className="flex items-center gap-2 mb-4">
-                                {selectedMeeting && (
+                                {/* {selectedMeeting && (
                                     <span className="text-xs text-slate-400 font-medium mr-1 shrink-0">
                                         {selectedMeeting.title}:
                                     </span>
-                                )}
+                                )} */}
                                 {availableTabs.map((tab) => (
                                     <button
                                         key={tab}
