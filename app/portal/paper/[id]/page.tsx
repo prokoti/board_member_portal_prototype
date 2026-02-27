@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Plus, MessageCircle, BookOpen, Users, FileText, Bookmark, X } from 'lucide-react'
 import AiCoSec from '@/components/AiCoSec'
@@ -66,7 +67,8 @@ const documentContent = [
 
 type NoteTab = 'My notes' | 'Discussion' | 'Minutes'
 
-export default function PaperViewerPage({ params }: { params: { id: string } }) {
+export default function PaperViewerPage() {
+    const params = useParams()
     const [activeNoteTab, setActiveNoteTab] = useState<NoteTab>('My notes')
     const [showPopover, setShowPopover] = useState(true)
     const [addingNote, setAddingNote] = useState(false)
@@ -126,8 +128,8 @@ export default function PaperViewerPage({ params }: { params: { id: string } }) 
                             key={tab}
                             onClick={() => setActiveNoteTab(tab)}
                             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeNoteTab === tab
-                                    ? 'bg-[#5E43D8] text-white shadow-sm'
-                                    : 'text-[#2D1B6B]/50 hover:bg-[#F4F0FF]'
+                                ? 'bg-[#5E43D8] text-white shadow-sm'
+                                : 'text-[#2D1B6B]/50 hover:bg-[#F4F0FF]'
                                 }`}
                         >
                             {tab === 'My notes' && <Bookmark style={{ width: 11, height: 11 }} />}
@@ -175,8 +177,8 @@ export default function PaperViewerPage({ params }: { params: { id: string } }) 
                             <div
                                 key={note.id}
                                 className={`p-3 rounded-xl border cursor-pointer transition-all group ${note.highlighted
-                                        ? 'border-[#5E43D8]/20 bg-[#EDE8FB]/50 shadow-sm'
-                                        : 'border-[#F4F0FF] bg-[#F4F0FF]/60 hover:border-[#5E43D8]/15 hover:bg-white'
+                                    ? 'border-[#5E43D8]/20 bg-[#EDE8FB]/50 shadow-sm'
+                                    : 'border-[#F4F0FF] bg-[#F4F0FF]/60 hover:border-[#5E43D8]/15 hover:bg-white'
                                     }`}
                             >
                                 <div className="flex items-start gap-2.5">
@@ -335,8 +337,8 @@ export default function PaperViewerPage({ params }: { params: { id: string } }) 
                     <button
                         onClick={() => setMarkedReviewed(!markedReviewed)}
                         className={`flex items-center gap-2 text-sm font-semibold px-6 py-2.5 rounded-xl transition-all shadow-[0_3px_10px_rgba(94,67,216,0.25)] ${markedReviewed
-                                ? 'bg-green-500 text-white shadow-[0_3px_10px_rgba(34,197,94,0.25)]'
-                                : 'bg-[#5E43D8] hover:bg-[#4B36AD] text-white'
+                            ? 'bg-green-500 text-white shadow-[0_3px_10px_rgba(34,197,94,0.25)]'
+                            : 'bg-[#5E43D8] hover:bg-[#4B36AD] text-white'
                             }`}
                     >
                         {markedReviewed ? '✓ Reviewed' : '⚑ Mark Reviewed'}

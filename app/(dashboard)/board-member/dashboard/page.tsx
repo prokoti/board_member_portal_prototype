@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 import { Scale, MessageSquare, AlertTriangle, ClipboardCheck } from 'lucide-react';
+import Link from 'next/link';
 // Demo: single fixed entity — no entity-selection UI needed
 const useEntityContext = () => ({ selectedEntityId: 'org-001' });
 
@@ -638,6 +639,16 @@ const meetingTypes = {
     'ESG Committee': 'esg'
 };
 
+// Which KPI tabs are relevant for each meeting category
+const meetingCategoryTabs: Record<string, TabType[]> = {
+    'board': ['Financials', 'Governance', 'Risk', 'Compliance'],
+    'finance': ['Financials'],
+    'audit': ['Compliance', 'Risk'],
+    'risk': ['Risk', 'Compliance'],
+    'esg': ['ESG', 'Governance'],
+    'remuneration': ['Governance', 'Financials'],
+};
+
 // Category colors matching the legend (only 3 colors)
 const categoryColors: Record<string, { bg: string; badge: string }> = {
     remuneration: { bg: 'bg-purple-400', badge: 'bg-purple-500' },
@@ -910,6 +921,46 @@ const defaultTasks: Task[] = [
     { id: 4, title: 'Circulate draft minutes', assignee: 'CoSec', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-1'] },
 ];
 
+// Meeting-category-specific tasks
+const tasksByMeetingCategory: Record<string, Task[]> = {
+    'board': [
+        { id: 1, title: 'Finalize board pack', assignee: 'CoSec', status: 'In progress', statusColor: 'bg-blue-100 text-blue-600', assignedUsers: ['user-1', 'user-2'] },
+        { id: 2, title: 'Confirm external speaker availability', assignee: 'CEO Office', status: 'Pending', statusColor: 'bg-amber-100 text-amber-600', assignedUsers: ['user-3'] },
+        { id: 3, title: 'Prepare CEO strategic update', assignee: 'CEO Office', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-4'] },
+        { id: 4, title: 'Circulate draft minutes', assignee: 'CoSec', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-1'] },
+    ],
+    'finance': [
+        { id: 1, title: 'Prepare Q financials report', assignee: 'Finance', status: 'In progress', statusColor: 'bg-blue-100 text-blue-600', assignedUsers: ['user-2', 'user-3'] },
+        { id: 2, title: 'Budget variance analysis', assignee: 'Finance Director', status: 'Pending', statusColor: 'bg-amber-100 text-amber-600', assignedUsers: ['user-3'] },
+        { id: 3, title: 'Treasury investment review', assignee: 'Treasury', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-5'] },
+        { id: 4, title: 'Board finance pack distribution', assignee: 'CoSec', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-1'] },
+    ],
+    'audit': [
+        { id: 1, title: 'Review internal audit findings', assignee: 'Internal Audit', status: 'In progress', statusColor: 'bg-blue-100 text-blue-600', assignedUsers: ['user-3', 'user-6'] },
+        { id: 2, title: 'Prepare management response', assignee: 'CFO', status: 'Pending', statusColor: 'bg-amber-100 text-amber-600', assignedUsers: ['user-2'] },
+        { id: 3, title: 'External auditor pre-meeting briefing', assignee: 'Finance', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-5'] },
+        { id: 4, title: 'Update audit action register', assignee: 'CoSec', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-1'] },
+    ],
+    'risk': [
+        { id: 1, title: 'Update risk dashboard', assignee: 'Risk', status: 'In progress', statusColor: 'bg-blue-100 text-blue-600', assignedUsers: ['user-4', 'user-5'] },
+        { id: 2, title: 'Emerging risk briefing document', assignee: 'Risk Manager', status: 'Pending', statusColor: 'bg-amber-100 text-amber-600', assignedUsers: ['user-4'] },
+        { id: 3, title: 'Risk appetite utilisation review', assignee: 'CRO', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-5'] },
+        { id: 4, title: 'Circulate risk committee minutes', assignee: 'CoSec', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-1'] },
+    ],
+    'esg': [
+        { id: 1, title: 'Prepare sustainability progress report', assignee: 'ESG', status: 'In progress', statusColor: 'bg-blue-100 text-blue-600', assignedUsers: ['user-2', 'user-6'] },
+        { id: 2, title: 'Carbon footprint data collection', assignee: 'Environment Manager', status: 'Pending', statusColor: 'bg-amber-100 text-amber-600', assignedUsers: ['user-6'] },
+        { id: 3, title: 'ESG score benchmarking analysis', assignee: 'Sustainability Officer', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-2'] },
+        { id: 4, title: 'Distribute ESG committee pack', assignee: 'CoSec', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-1'] },
+    ],
+    'remuneration': [
+        { id: 1, title: 'Prepare executive pay benchmarking', assignee: 'HR Director', status: 'In progress', statusColor: 'bg-blue-100 text-blue-600', assignedUsers: ['user-3', 'user-4'] },
+        { id: 2, title: 'Bonus pool calculation', assignee: 'Finance', status: 'Pending', statusColor: 'bg-amber-100 text-amber-600', assignedUsers: ['user-2'] },
+        { id: 3, title: 'Remuneration policy review', assignee: 'Legal', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-5'] },
+        { id: 4, title: 'Circulate remuneration minutes', assignee: 'CoSec', status: 'Not started', statusColor: 'bg-slate-100 text-slate-500', assignedUsers: ['user-1'] },
+    ],
+};
+
 // Generate mock tasks for entities not in the predefined list
 const generateMockTasks = (entityId: string): Task[] => {
     // Use entity ID to seed "randomness" for consistent data per entity
@@ -981,6 +1032,23 @@ export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<TabType>('Financials');
     const [currentDate, setCurrentDate] = useState(new Date(2025, 3, 1)); // April 2025
     const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>('meeting-apr-1');
+
+    // Auto-switch active tab AND tasks when selected meeting changes
+    React.useEffect(() => {
+        const meetings = getMeetingsForMonth(currentDate, selectedEntityId);
+        const meeting = meetings.find(m => m.id === selectedMeetingId);
+        if (meeting) {
+            // Switch tabs
+            const availTabs = meetingCategoryTabs[meeting.category] || (['Financials'] as TabType[]);
+            if (!availTabs.includes(activeTab)) {
+                setActiveTab(availTabs[0]);
+            }
+            // Switch tasks
+            const categoryTasks = tasksByMeetingCategory[meeting.category] || defaultTasks;
+            setMeetingTasks(categoryTasks);
+            setSelectedTaskIds([]);
+        }
+    }, [selectedMeetingId]);
 
     // Entity type for local storage data
     interface LocalStorageOrg {
@@ -1420,7 +1488,7 @@ export default function DashboardPage() {
                                                 <h4 className="font-bold text-slate-900 mb-3">Meeting Agenda</h4>
                                                 <div className="space-y-3">
                                                     {agenda.map((item, idx) => (
-                                                        <div onClick={() => router.push(`/board-member/packs/546554asdokd6dfhidf4`)} key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                                                        <Link href={`/board-member/packs/546554asdokd6dfhidf4`} key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl cursor-pointer">
                                                             <div className="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                                                                 {idx + 1}
                                                             </div>
@@ -1429,7 +1497,7 @@ export default function DashboardPage() {
                                                                 <p className="text-xs text-slate-500">{item.time} • {item.speaker}</p>
                                                             </div>
                                                             <span className="text-xs text-slate-400">{item.duration}</span>
-                                                        </div>
+                                                        </Link>
                                                     ))}
                                                 </div>
                                             </div>
@@ -1682,7 +1750,7 @@ export default function DashboardPage() {
 
     // Render comparison dashboard if "All Entities" is selected
     if (!selectedEntityId) {
-        return <ComparisonDashboard />; 
+        return <ComparisonDashboard />;
     }
 
     return (
@@ -1849,7 +1917,7 @@ export default function DashboardPage() {
                             </h3>
                             <div className="space-y-3 overflow-y-auto max-h-[500px] scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                                 {currentAgenda.map((item) => (
-                                    <div key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                                    <Link href={`/board-member/packs/546554asdokd6dfhidf4`} key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer">
                                         <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">
                                             {item.id}
                                         </div>
@@ -1867,7 +1935,7 @@ export default function DashboardPage() {
                                             </div>
                                         </div>
                                         <span className="text-xs text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full">{item.duration}</span>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
@@ -2195,21 +2263,33 @@ export default function DashboardPage() {
 
                 {/* Bottom Section - Financial Charts */}
                 <div className="col-span-12">
-                    {/* Tabs */}
-                    <div className="flex items-center gap-2 mb-4">
-                        {(['Financials', 'ESG', 'Governance', 'Risk', 'Compliance'] as TabType[]).map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${activeTab === tab
-                                    ? 'bg-slate-900 text-white'
-                                    : 'bg-white text-slate-600 hover:bg-slate-100'
-                                    }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
+                    {/* Tabs — filtered by selected meeting's category */}
+                    {(() => {
+                        const availableTabs: TabType[] = selectedMeeting
+                            ? (meetingCategoryTabs[selectedMeeting.category] || ['Financials', 'ESG', 'Governance', 'Risk', 'Compliance'] as TabType[])
+                            : ['Financials', 'ESG', 'Governance', 'Risk', 'Compliance'] as TabType[];
+                        return (
+                            <div className="flex items-center gap-2 mb-4">
+                                {selectedMeeting && (
+                                    <span className="text-xs text-slate-400 font-medium mr-1 shrink-0">
+                                        {selectedMeeting.title}:
+                                    </span>
+                                )}
+                                {availableTabs.map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${activeTab === tab
+                                            ? 'bg-slate-900 text-white'
+                                            : 'bg-white text-slate-600 hover:bg-slate-100'
+                                            }`}
+                                    >
+                                        {tab}
+                                    </button>
+                                ))}
+                            </div>
+                        );
+                    })()}
 
                     {/* Charts Grid */}
                     <div className="grid grid-cols-3 gap-6">
@@ -2304,177 +2384,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            <div className="space-y-8 animate-in fade-in duration-500 py-12 pr-4 font-medium">
-                <div className="grid grid-cols-4 gap-6">
-                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 -mr-8 -mt-8 rounded-full transition-all group-hover:scale-110" />
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Governance Index</span>
-                            <div className="bg-blue-100 text-blue-600 p-1.5 rounded-lg z-10"><Scale className="w-4 h-4" /></div>
-                        </div>
-                        <div className="flex items-end gap-3">
-                            <span className="text-4xl font-extrabold text-slate-900 tracking-tighter">{currentEntityData.governanceIndex}</span>
-                            <span className="text-green-500 text-sm font-bold mb-1 flex items-center">
-                                <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd"></path></svg>
-                                {currentEntityData.governanceChange}%
-                            </span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tighter">Vs. Sector Benchmark: {currentEntityData.sectorBenchmark}</p>
-                    </div>
 
-                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Open Actions</span>
-                            <div className="bg-amber-100 text-amber-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform"><MessageSquare className="w-4 h-4" /></div>
-                        </div>
-                        <div className="flex items-end gap-3">
-                            <span className="text-4xl font-extrabold text-slate-900 tracking-tighter">{currentEntityData.openActions}</span>
-                            <span className="text-red-500 text-[10px] font-extrabold mb-1 uppercase tracking-tighter">{currentEntityData.overdueActions} Overdue</span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tighter">Closure Rate: {currentEntityData.closureRate}%</p>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Residual Risk</span>
-                            <div className="bg-red-100 text-red-600 p-1.5 rounded-lg"><AlertTriangle className="w-4 h-4" /></div>
-                        </div>
-                        <div className="flex items-end gap-3">
-                            <span className="text-4xl font-extrabold text-slate-900 tracking-tighter">{currentEntityData.residualRisk}</span>
-                            <span className="text-slate-400 text-[10px] font-bold mb-1 uppercase tracking-tighter">{currentEntityData.riskStatus}</span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tighter">Profile: {currentEntityData.riskProfile}</p>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Compliance Health</span>
-                            <div className="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><ClipboardCheck className="w-4 h-4" /></div>
-                        </div>
-                        <div className="flex items-end gap-3">
-                            <span className="text-4xl font-extrabold text-slate-900 tracking-tighter">{currentEntityData.complianceHealth}%</span>
-                            <span className="text-blue-500 text-[10px] font-extrabold mb-1 uppercase tracking-tighter">{currentEntityData.complianceStatus}</span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-tighter">{currentEntityData.mandatoryFilings} Mandatory Filings</p>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-8">
-                    <div className="col-span-2 space-y-8">
-                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                            <div className="flex justify-between items-center mb-8">
-                                <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                                    Governance Maturity Trend
-                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full uppercase font-extrabold tracking-widest border border-blue-100">AI Narrative Active</span>
-                                </h3>
-                                <div className="flex items-center gap-2 font-extrabold text-[10px] text-slate-400 uppercase tracking-widest">
-                                    <div className="w-3 h-3 rounded-full bg-blue-600" /> Group Average
-                                </div>
-                            </div>
-                            <div className="h-72">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={currentEntityData.maturityTrend}>
-                                        <defs>
-                                            <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
-                                                <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} dy={10} />
-                                        <YAxis hide domain={[0, 100]} />
-                                        <Tooltip
-                                            contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.1)', padding: '16px' }}
-                                            cursor={{ stroke: '#2563eb', strokeWidth: 2 }}
-                                        />
-                                        <Area type="monotone" dataKey="score" stroke="#2563eb" strokeWidth={4} fillOpacity={1} fill="url(#colorScore)" animationDuration={2000} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <div className="mt-8 pt-8 border-t border-slate-100 grid grid-cols-3 gap-8">
-                                <div>
-                                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-1">Top Strength</p>
-                                    <p className="text-sm font-extrabold text-slate-900 leading-tight">Board Meeting Cadence</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-1">Lagging Metric</p>
-                                    <p className="text-sm font-extrabold text-red-500 leading-tight">Action Closing Latency</p>
-                                </div>
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-inner">
-                                    <p className="text-[10px] text-blue-600 font-extrabold uppercase tracking-widest mb-1 leading-none">AI RECOMMENDATION</p>
-                                    <p className="text-xs font-bold text-slate-600 leading-normal italic">"Prioritize Cybersecurity deep-dive in Q1 Board as current policy review is lagging."</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm overflow-hidden relative">
-                            <h3 className="text-lg font-extrabold text-slate-900 mb-6 uppercase tracking-widest text-[11px]">STP READINESS</h3>
-                            <div className="h-48 relative">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={currentEntityData.stpData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={65}
-                                            outerRadius={85}
-                                            paddingAngle={6}
-                                            dataKey="value"
-                                            animationBegin={500}
-                                            animationDuration={1500}
-                                        >
-                                            {currentEntityData.stpData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                    </PieChart>
-                                </ResponsiveContainer>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span className="text-3xl font-extrabold text-slate-900 tracking-tighter">{100 - currentEntityData.stpData[0].value}%</span>
-                                    <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-tighter leading-none mt-1">Automated</span>
-                                </div>
-                            </div>
-                            <div className="mt-4 space-y-3 font-extrabold">
-                                {currentEntityData.stpData.map(item => (
-                                    <div key={item.name} className="flex justify-between items-center text-[10px]">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                                            <span className="text-slate-600 uppercase tracking-tighter">{item.name}</span>
-                                        </div>
-                                        <span className="text-slate-900">{item.value}%</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm overflow-hidden relative group">
-                            <h3 className="text-sm text-slate-900 mb-6 uppercase tracking-widest font-extrabold">Entity Benchmark (v3.0)</h3>
-                            <div className="space-y-4">
-                                {currentEntityData.entityComparison.map(entity => (
-                                    <div key={entity.name} className="flex flex-col gap-1.5">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-xs font-bold text-slate-700">{entity.name}</span>
-                                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${entity.status === 'Optimized' ? 'bg-emerald-100 text-emerald-600' :
-                                                entity.status === 'Live' ? 'bg-blue-100 text-blue-600' :
-                                                    entity.status === 'In Progress' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'
-                                                }`}>{entity.status}</span>
-                                        </div>
-                                        <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden shadow-inner">
-                                            <div className={`h-full ${entity.score > 85 ? 'bg-emerald-500' : entity.score > 70 ? 'bg-blue-500' : 'bg-amber-500'} rounded-full transition-all duration-1000`} style={{ width: `${entity.score}%` }} />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mt-8 p-4 bg-slate-900 rounded-2xl text-white shadow-xl shadow-slate-900/10 active:scale-95 cursor-pointer transition-all">
-                                <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1 text-blue-400">Governance Index Summary</p>
-                                <p className="text-xs font-bold leading-relaxed">Entity "Group PLC" is outperforming the sector benchmark by 18.2 points.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };

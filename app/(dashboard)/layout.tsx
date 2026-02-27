@@ -21,7 +21,7 @@ import {
     X,
 } from 'lucide-react'
 
-type UserRole = 'BOARD_OPS' | 'TENANT_ADMIN' | 'SUPER_ADMIN' | 'BOARD_MEMBER'
+type UserRole = 'BOARD_OPS' | 'TENANT_ADMIN' | 'SUPER_ADMIN' | 'BOARD_MEMBER' | 'PARTNER'
 
 interface NavItem {
     label: string
@@ -55,6 +55,14 @@ const ROLE_NAV: Record<UserRole, NavItem[]> = {
         { label: 'Meetings', href: '/board-member/meetings', icon: <Calendar className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
         { label: 'Actions', href: '/board-member/actions', icon: <CheckSquare className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
     ],
+    PARTNER: [
+        { label: 'Dashboard', href: '/partner/dashboard', icon: <LayoutDashboard className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
+        { label: 'Clients', href: '/partner/clients', icon: <Users className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
+        { label: 'Payouts', href: '/partner/payouts', icon: <Briefcase className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
+        { label: 'Reports', href: '/partner/reports', icon: <FileText className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
+        { label: 'Profile', href: '/partner/profile', icon: <User className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
+        { label: 'Settings', href: '/partner/settings', icon: <Settings className="w-5 h-5 2xl:w-6 2xl:h-6" /> },
+    ],
 }
 
 const ROLE_META: Record<UserRole, { label: string; gradient: string; icon: React.ReactNode; userLabel: string }> = {
@@ -62,6 +70,7 @@ const ROLE_META: Record<UserRole, { label: string; gradient: string; icon: React
     TENANT_ADMIN: { label: 'Tenant Admin', gradient: 'from-[#5E43D8] to-[#8B72E8]', icon: <Settings className="w-4 h-4 text-white" />, userLabel: 'Tenant Admin' },
     SUPER_ADMIN: { label: 'Super Admin', gradient: 'from-[#C2410C] to-[#EA580C]', icon: <Shield className="w-4 h-4 text-white" />, userLabel: 'Super Admin' },
     BOARD_MEMBER: { label: 'Board member', gradient: 'from-[#047857] to-[#059669]', icon: <Users className="w-4 h-4 text-white" />, userLabel: 'Board member' },
+    PARTNER: { label: 'Partner', gradient: 'from-[#047857] to-[#059669]', icon: <Users className="w-4 h-4 text-white" />, userLabel: 'Partner' },
 }
 
 // Fake user info — in a real app this would come from session/auth
@@ -70,6 +79,7 @@ const USER_INFO: Record<UserRole, { name: string; avatarUrl?: string }> = {
     TENANT_ADMIN: { name: 'Sarah Connor' },
     SUPER_ADMIN: { name: 'Admin User' },
     BOARD_MEMBER: { name: 'Mads Mikkelsen', avatarUrl: 'https://api.dicebear.com/7.x/notionists/svg?seed=Mads' },
+    PARTNER: { name: 'Anura Wijesinghe', avatarUrl: 'https://api.dicebear.com/7.x/notionists/svg?seed=Partner' },
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
