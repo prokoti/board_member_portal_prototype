@@ -9,9 +9,10 @@ import {
     Settings,
     ChevronRight,
     CheckCircle2,
+    Link
 } from 'lucide-react'
 
-type UserRole = 'BOARD_OPS' | 'TENANT_ADMIN' | 'SUPER_ADMIN' | 'BOARD_MEMBER'
+type UserRole = 'BOARD_OPS' | 'TENANT_ADMIN' | 'SUPER_ADMIN' | 'BOARD_MEMBER' | 'PARTNER'
 
 interface RoleOption {
     id: UserRole
@@ -65,6 +66,16 @@ const ROLES: RoleOption[] = [
         badge: 'Member',
         route: '/board-member/dashboard',
     },
+    {
+        id: 'PARTNER',
+        label: 'Partner',
+        description: 'Manage client referrals, revenues, and marketing',
+        icon: <Link className="w-9 h-9" />,    
+        gradient: 'from-[#4338CA] to-[#4F46E5]',
+        ring: 'ring-[#4338CA]',
+        badge: 'Partner',
+        route: '/partner/dashboard',
+    },
 ]
 
 export default function SelectRolePage() {
@@ -115,8 +126,8 @@ export default function SelectRolePage() {
                             key={role.id}
                             onClick={() => setSelected(role.id)}
                             className={`relative text-left p-6 rounded-2xl border transition-all duration-200 group ${isSelected
-                                    ? `bg-white/12 border-white/50 ring-2 ${role.ring} ring-offset-2 ring-offset-transparent shadow-xl`
-                                    : 'bg-white/5 border-white/12 hover:bg-white/10 hover:border-white/30'
+                                ? `bg-white/12 border-white/50 ring-2 ${role.ring} ring-offset-2 ring-offset-transparent shadow-xl`
+                                : 'bg-white/5 border-white/12 hover:bg-white/10 hover:border-white/30'
                                 }`}
                         >
                             {/* Icon + badge row */}

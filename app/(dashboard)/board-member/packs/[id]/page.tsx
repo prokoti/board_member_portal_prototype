@@ -431,7 +431,7 @@ export default function PackDetailPage() {
         <div className="flex flex-col px-4 lg:px-0 h-[95vh] bg-white overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", minWidth: 0 }}>
 
             {/* ── Pack title + tabs row ─────────────────────────────────────── */}
-            <div className="pt-4 pb-0 w-full max-w-screen-2xl mx-auto border-b border-gray-200 bg-white shrink-0 px-0">
+            <div className="pt-4 pb-0 w-full max-w-screen-2xl mx-auto border-b border-gray-200 bg-white shrink-0 px-4">
                 <h1 className="text-xl sm:text-xl md:text-lg lg:text-3xl font-bold text-slate-900 leading-tight">Board Paper: Q3 Strategic Review &amp; Budget Proposal</h1>
                 <p className="text-sm sm:text-base text-slate-500 mt-0.5 mb-2">Board Meeting · March 16, 2026</p>
                 <div className="flex items-center justify-between gap-2">
@@ -468,7 +468,7 @@ export default function PackDetailPage() {
             </div>
 
             {/* ── Main content area ─────────────────────────────────────────── */}
-            <div className="flex flex-1 overflow-hidden w-full max-w-screen-2xl mx-auto" style={{ minWidth: 0 }}>
+            <div className="flex flex-1 overflow-hidden w-full max-w-screen-2xl mx-auto px-4" style={{ minWidth: 0 }}>
 
                 {/* ══ DISCUSSION TAB ══════════════════════════════════════════ */}
                 {activeTab === 'discussion' && (
